@@ -8,7 +8,8 @@ use sdl2::render::{Canvas, RenderTarget};
 use std::time::Duration;
 
 struct canvas_buffer {
-    brightness: [[u8;800];600]
+    brightness: [[u8;800];600],
+    phase: i32
 }
 
 impl canvas_buffer {
@@ -16,10 +17,21 @@ impl canvas_buffer {
     where T: RenderTarget {
         for i in 0..600 {
             for j in 0..800 {
-                canvas.set_draw_color(Color::RGB(0, 0, self.brightness[i][j]));
+                canvas.set_draw_color(Color::RGB(self.brightness[i][j], self.brightness[i][j], self.brightness[i][j]));
                 canvas.draw_point(Point::new(j as i32,i as i32));
             }
         }
+    }
+    
+    pub fn sine_wave(& mut self) {
+        for i in 0..600 {
+            for j in 0..800 {
+                let sin = ((j + self.phase as usize) as f32 / 800.0 * 20.0).sin() + 1.0;
+                let b = 55 + (sin / 2.0 * 200.0) as u8; 
+                self.brightness[i][j] = b;
+            }
+        }
+        self.phase += 5;
     }
 }
 
@@ -34,7 +46,7 @@ pub fn main() {
 
     let mut canvas = window.into_canvas().build().unwrap();
 
-    let mut buffer = canvas_buffer{brightness: [[0;800];600]};
+    let mut buffer = canvas_buffer{brightness: [[0;800];600],phase:0};
     
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
@@ -54,6 +66,7 @@ pub fn main() {
                 _ => {}
             }
         }
+        buffer.sine_wave();
         buffer.draw_on_canvas(&mut canvas);
         // The rest of the game loop goes here...
         
