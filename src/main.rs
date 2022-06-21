@@ -33,6 +33,19 @@ impl canvas_buffer {
         }
         self.phase += 5;
     }
+    
+    pub fn circle(&mut self, center: Point, radius: f32) {
+        for y in 0..600i32 {
+            for x in 0..800i32 {
+                let r = (((x - center.x).pow(2) + (y - center.y).pow(2)) as f32).sqrt();
+                if r.round() == radius.round() {
+                    self.brightness[y as usize][x as usize] = 255;
+                } else {
+                    self.brightness[y as usize][x as usize] = 0;
+                }
+            }
+        }
+    }
 }
 
 pub fn main() {
@@ -66,7 +79,8 @@ pub fn main() {
                 _ => {}
             }
         }
-        buffer.sine_wave();
+        // buffer.sine_wave();
+        buffer.circle(Point::new(400, 300), 80f32);
         buffer.draw_on_canvas(&mut canvas);
         // The rest of the game loop goes here...
         
